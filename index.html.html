@@ -1,0 +1,1755 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Libra Scale World — Data Science & AI Academy</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=DM+Sans:wght@300;400;500&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --gold: #C9A84C;
+    --gold-light: #E8C97A;
+    --gold-dim: #8A6E2F;
+    --black: #0A0A08;
+    --off-black: #111110;
+    --surface: #161614;
+    --surface2: #1E1E1B;
+    --border: rgba(201,168,76,0.18);
+    --border-dim: rgba(255,255,255,0.07);
+    --text: #F0EDE6;
+    --text-muted: #9A9589;
+    --text-dim: #5A574F;
+    --teal: #2ABFA0;
+    --teal-dim: #1A7A67;
+    --amber: #E8971A;
+    --purple: #8B7FD4;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--black);
+    color: var(--text);
+    overflow-x: hidden;
+    font-size: 16px;
+    line-height: 1.7;
+  }
+
+  /* NOISE TEXTURE OVERLAY */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 9999;
+    opacity: 0.4;
+  }
+
+  /* NAV */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    padding: 20px 48px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--border-dim);
+    background: rgba(10,10,8,0.85);
+    backdrop-filter: blur(12px);
+  }
+
+  .nav-logo {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 22px;
+    font-weight: 600;
+    color: var(--gold);
+    letter-spacing: 0.02em;
+    text-decoration: none;
+  }
+
+  .nav-logo span { color: var(--text); font-weight: 400; }
+
+  .nav-links {
+    display: flex;
+    gap: 36px;
+    list-style: none;
+  }
+
+  .nav-links a {
+    color: var(--text-muted);
+    text-decoration: none;
+    font-size: 13px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    transition: color 0.2s;
+  }
+
+  .nav-links a:hover { color: var(--gold); }
+
+  .nav-cta {
+    background: var(--gold);
+    color: var(--black) !important;
+    padding: 10px 22px;
+    border-radius: 2px;
+    font-weight: 500;
+    font-size: 13px !important;
+    letter-spacing: 0.06em;
+    transition: background 0.2s !important;
+  }
+
+  .nav-cta:hover { background: var(--gold-light) !important; color: var(--black) !important; }
+
+  /* HERO */
+  .hero {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 140px 48px 80px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero-grid-bg {
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(201,168,76,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(201,168,76,0.04) 1px, transparent 1px);
+    background-size: 60px 60px;
+    mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 40%, transparent 100%);
+  }
+
+  .hero-glow {
+    position: absolute;
+    top: 20%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(circle, rgba(201,168,76,0.08) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .hero-eyebrow {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-bottom: 24px;
+    opacity: 0;
+    animation: fadeUp 0.8s 0.2s forwards;
+  }
+
+  .hero-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(52px, 7vw, 96px);
+    font-weight: 600;
+    line-height: 1.0;
+    letter-spacing: -0.01em;
+    max-width: 900px;
+    opacity: 0;
+    animation: fadeUp 0.8s 0.35s forwards;
+  }
+
+  .hero-title em {
+    font-style: italic;
+    color: var(--gold);
+  }
+
+  .hero-subtitle {
+    font-size: 18px;
+    color: var(--text-muted);
+    max-width: 580px;
+    margin-top: 28px;
+    font-weight: 300;
+    line-height: 1.8;
+    opacity: 0;
+    animation: fadeUp 0.8s 0.5s forwards;
+  }
+
+  .hero-actions {
+    display: flex;
+    gap: 16px;
+    margin-top: 44px;
+    align-items: center;
+    opacity: 0;
+    animation: fadeUp 0.8s 0.65s forwards;
+  }
+
+  .btn-primary {
+    background: var(--gold);
+    color: var(--black);
+    padding: 16px 36px;
+    border-radius: 2px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    text-decoration: none;
+    transition: all 0.2s;
+    border: none;
+    cursor: pointer;
+  }
+
+  .btn-primary:hover { background: var(--gold-light); transform: translateY(-1px); }
+
+  .btn-ghost {
+    color: var(--text-muted);
+    padding: 16px 28px;
+    font-size: 14px;
+    text-decoration: none;
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    letter-spacing: 0.06em;
+    transition: all 0.2s;
+  }
+
+  .btn-ghost:hover { color: var(--text); border-color: var(--gold); }
+
+  .hero-stats {
+    display: flex;
+    gap: 56px;
+    margin-top: 80px;
+    padding-top: 48px;
+    border-top: 1px solid var(--border-dim);
+    opacity: 0;
+    animation: fadeUp 0.8s 0.8s forwards;
+  }
+
+  .hero-stat-val {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 42px;
+    font-weight: 600;
+    color: var(--gold);
+    line-height: 1;
+  }
+
+  .hero-stat-lbl {
+    font-size: 12px;
+    color: var(--text-dim);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-top: 6px;
+  }
+
+  /* SECTION SHARED */
+  section { padding: 100px 48px; }
+
+  .section-tag {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.25em;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+
+  .section-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(36px, 4.5vw, 56px);
+    font-weight: 600;
+    line-height: 1.1;
+    letter-spacing: -0.01em;
+    max-width: 700px;
+  }
+
+  .section-title em { font-style: italic; color: var(--gold); }
+
+  /* TRUST BAR */
+  .trust-bar {
+    padding: 32px 48px;
+    border-top: 1px solid var(--border-dim);
+    border-bottom: 1px solid var(--border-dim);
+    background: var(--surface);
+    display: flex;
+    align-items: center;
+    gap: 48px;
+    overflow: hidden;
+  }
+
+  .trust-label {
+    font-size: 11px;
+    color: var(--text-dim);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .trust-items {
+    display: flex;
+    gap: 48px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  .trust-item {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 16px;
+    color: var(--text-muted);
+    font-weight: 500;
+    white-space: nowrap;
+  }
+
+  /* LEVELS */
+  .levels-section { background: var(--off-black); }
+
+  .levels-intro {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 80px;
+    align-items: end;
+    margin-bottom: 64px;
+  }
+
+  .levels-desc {
+    font-size: 16px;
+    color: var(--text-muted);
+    max-width: 460px;
+    line-height: 1.9;
+    font-weight: 300;
+    margin-top: 20px;
+  }
+
+  .levels-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: var(--border-dim);
+    border: 1px solid var(--border-dim);
+  }
+
+  .level-card {
+    background: var(--surface);
+    padding: 40px 36px;
+    position: relative;
+    transition: background 0.3s;
+  }
+
+  .level-card:hover { background: var(--surface2); }
+
+  .level-card.featured {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+  }
+
+  .level-num {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+
+  .level-name {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 28px;
+    font-weight: 600;
+    color: var(--text);
+    line-height: 1.2;
+    margin-bottom: 8px;
+  }
+
+  .level-tagline {
+    font-size: 13px;
+    color: var(--text-muted);
+    margin-bottom: 28px;
+    line-height: 1.6;
+  }
+
+  .level-price {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 40px;
+    font-weight: 600;
+    color: var(--gold);
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+
+  .level-price-note {
+    font-size: 12px;
+    color: var(--text-dim);
+    margin-bottom: 28px;
+  }
+
+  .level-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 32px;
+  }
+
+  .level-meta-item {
+    font-size: 13px;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .level-meta-item::before {
+    content: '';
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: var(--gold-dim);
+    flex-shrink: 0;
+  }
+
+  .level-modules {
+    border-top: 1px solid var(--border-dim);
+    padding-top: 24px;
+  }
+
+  .level-modules-label {
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+
+  .module-pill {
+    display: inline-block;
+    font-size: 11px;
+    padding: 4px 10px;
+    border-radius: 2px;
+    border: 1px solid var(--border-dim);
+    color: var(--text-dim);
+    margin: 3px 3px 0 0;
+    transition: all 0.2s;
+  }
+
+  .level-card:hover .module-pill { border-color: var(--border); color: var(--text-muted); }
+
+  .featured-badge {
+    position: absolute;
+    top: -1px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--gold);
+    color: var(--black);
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 5px 16px;
+    border-radius: 0 0 4px 4px;
+  }
+
+  .level-btn {
+    display: block;
+    text-align: center;
+    padding: 13px;
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    font-size: 13px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    text-decoration: none;
+    color: var(--gold);
+    margin-top: 32px;
+    transition: all 0.2s;
+  }
+
+  .level-btn:hover { background: var(--gold); color: var(--black); }
+
+  .level-btn.primary { background: var(--gold); color: var(--black); }
+  .level-btn.primary:hover { background: var(--gold-light); }
+
+  /* MODULES PREVIEW */
+  .modules-section { background: var(--black); }
+
+  .modules-tabs {
+    display: flex;
+    gap: 0;
+    border-bottom: 1px solid var(--border-dim);
+    margin-bottom: 48px;
+  }
+
+  .mod-tab {
+    padding: 14px 28px;
+    font-size: 13px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s;
+    background: none;
+    border-top: none;
+    border-left: none;
+    border-right: none;
+    font-family: 'DM Sans', sans-serif;
+  }
+
+  .mod-tab.active { color: var(--gold); border-bottom-color: var(--gold); }
+  .mod-tab:hover:not(.active) { color: var(--text-muted); }
+
+  .tab-content { display: none; }
+  .tab-content.active { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1px; background: var(--border-dim); border: 1px solid var(--border-dim); }
+
+  .mod-item {
+    background: var(--surface);
+    padding: 28px 28px;
+    transition: background 0.2s;
+  }
+
+  .mod-item:hover { background: var(--surface2); }
+
+  .mod-item-code {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    color: var(--gold-dim);
+    letter-spacing: 0.15em;
+    margin-bottom: 8px;
+  }
+
+  .mod-item-title {
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--text);
+    margin-bottom: 6px;
+    line-height: 1.4;
+  }
+
+  .mod-item-meta {
+    font-size: 12px;
+    color: var(--text-dim);
+    margin-bottom: 12px;
+  }
+
+  .mod-item-tags {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+
+  .mod-tag {
+    font-size: 10px;
+    padding: 3px 8px;
+    border: 1px solid var(--border-dim);
+    border-radius: 1px;
+    color: var(--text-dim);
+    letter-spacing: 0.05em;
+  }
+
+  /* INSTRUCTOR */
+  .instructor-section {
+    background: var(--surface);
+    border-top: 1px solid var(--border-dim);
+    border-bottom: 1px solid var(--border-dim);
+  }
+
+  .instructor-grid {
+    display: grid;
+    grid-template-columns: 380px 1fr;
+    gap: 80px;
+    align-items: center;
+  }
+
+  .instructor-card {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    padding: 40px;
+    position: relative;
+  }
+
+  .instructor-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--gold), var(--gold-dim));
+  }
+
+  .instructor-avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--gold-dim), var(--gold));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 28px;
+    font-weight: 600;
+    color: var(--black);
+    margin-bottom: 20px;
+  }
+
+  .instructor-name {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 26px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 4px;
+  }
+
+  .instructor-role {
+    font-size: 12px;
+    color: var(--gold);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 24px;
+  }
+
+  .instructor-badges {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .instructor-badge {
+    font-size: 12px;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .instructor-badge::before {
+    content: '';
+    width: 3px;
+    height: 3px;
+    border-radius: 50%;
+    background: var(--gold);
+    flex-shrink: 0;
+  }
+
+  .instructor-bio-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 36px;
+    font-weight: 600;
+    line-height: 1.2;
+    margin-bottom: 24px;
+  }
+
+  .instructor-bio-title em { font-style: italic; color: var(--gold); }
+
+  .instructor-bio-text {
+    font-size: 15px;
+    color: var(--text-muted);
+    line-height: 1.9;
+    font-weight: 300;
+    margin-bottom: 16px;
+  }
+
+  .instructor-achievements {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+    margin-top: 32px;
+  }
+
+  .achievement {
+    padding: 16px;
+    border: 1px solid var(--border-dim);
+    border-radius: 2px;
+  }
+
+  .achievement-val {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 28px;
+    font-weight: 600;
+    color: var(--gold);
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+
+  .achievement-lbl {
+    font-size: 11px;
+    color: var(--text-dim);
+    letter-spacing: 0.06em;
+  }
+
+  /* TESTIMONIALS */
+  .testimonials-section { background: var(--off-black); }
+
+  .testimonials-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: var(--border-dim);
+    border: 1px solid var(--border-dim);
+    margin-top: 56px;
+  }
+
+  .testimonial {
+    background: var(--surface);
+    padding: 36px 32px;
+    transition: background 0.2s;
+  }
+
+  .testimonial:hover { background: var(--surface2); }
+
+  .testimonial-quote {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 18px;
+    font-weight: 500;
+    color: var(--text);
+    line-height: 1.7;
+    margin-bottom: 28px;
+  }
+
+  .testimonial-quote::before {
+    content: '\201C';
+    color: var(--gold);
+    font-size: 36px;
+    display: block;
+    line-height: 1;
+    margin-bottom: 8px;
+  }
+
+  .testimonial-author {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-muted);
+  }
+
+  .testimonial-org {
+    font-size: 11px;
+    color: var(--text-dim);
+    margin-top: 3px;
+    letter-spacing: 0.06em;
+  }
+
+  .testimonial-stars {
+    color: var(--gold);
+    font-size: 13px;
+    margin-bottom: 16px;
+    letter-spacing: 2px;
+  }
+
+  /* CERTIFICATE */
+  .cert-section { background: var(--black); }
+
+  .cert-showcase {
+    display: grid;
+    grid-template-columns: 1fr 520px;
+    gap: 80px;
+    align-items: center;
+    margin-top: 56px;
+  }
+
+  .cert-points {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    margin-top: 32px;
+  }
+
+  .cert-point {
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+  }
+
+  .cert-point-num {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--gold);
+    flex-shrink: 0;
+    padding-top: 2px;
+  }
+
+  .cert-point-text {
+    font-size: 14px;
+    color: var(--text-muted);
+    line-height: 1.7;
+  }
+
+  .cert-point-text strong {
+    color: var(--text);
+    font-weight: 500;
+    display: block;
+    margin-bottom: 2px;
+  }
+
+  .cert-mockup {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    padding: 48px 44px;
+    position: relative;
+    aspect-ratio: 1.414;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+
+  .cert-mockup::before {
+    content: '';
+    position: absolute;
+    inset: 8px;
+    border: 1px solid var(--border);
+    pointer-events: none;
+  }
+
+  .cert-mockup-top {
+    text-align: center;
+  }
+
+  .cert-logo-text {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 14px;
+    letter-spacing: 0.2em;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+
+  .cert-divider {
+    width: 80px;
+    height: 1px;
+    background: var(--border);
+    margin: 12px auto;
+  }
+
+  .cert-title-text {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  .cert-name {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 28px;
+    font-style: italic;
+    color: var(--text);
+    font-weight: 500;
+  }
+
+  .cert-award-text {
+    font-size: 11px;
+    color: var(--text-dim);
+    text-align: center;
+    line-height: 1.6;
+    margin: 16px 0;
+  }
+
+  .cert-credential {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--gold);
+    text-align: center;
+  }
+
+  .cert-bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+  }
+
+  .cert-sig-line {
+    width: 100px;
+    height: 1px;
+    background: var(--border);
+    margin-bottom: 4px;
+  }
+
+  .cert-sig-label {
+    font-size: 9px;
+    letter-spacing: 0.12em;
+    color: var(--text-dim);
+    text-transform: uppercase;
+  }
+
+  .cert-qr {
+    width: 44px;
+    height: 44px;
+    background: var(--border-dim);
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 2px;
+    padding: 6px;
+  }
+
+  .qr-cell {
+    background: var(--gold-dim);
+    border-radius: 1px;
+  }
+
+  /* PRICING */
+  .pricing-section { background: var(--surface); }
+
+  .pricing-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: var(--border-dim);
+    border: 1px solid var(--border-dim);
+    margin-top: 56px;
+  }
+
+  .price-card {
+    background: var(--off-black);
+    padding: 44px 36px;
+    position: relative;
+    transition: background 0.2s;
+  }
+
+  .price-card:hover { background: var(--surface2); }
+
+  .price-card.featured {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+  }
+
+  .price-level {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+
+  .price-name {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 24px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 24px;
+  }
+
+  .price-amount {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 52px;
+    font-weight: 600;
+    color: var(--gold);
+    line-height: 1;
+    margin-bottom: 6px;
+  }
+
+  .price-amount sup {
+    font-size: 22px;
+    vertical-align: super;
+  }
+
+  .price-period {
+    font-size: 12px;
+    color: var(--text-dim);
+    margin-bottom: 32px;
+  }
+
+  .price-features {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 36px;
+  }
+
+  .price-feature {
+    font-size: 13px;
+    color: var(--text-muted);
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+  }
+
+  .price-feature::before {
+    content: '—';
+    color: var(--gold-dim);
+    flex-shrink: 0;
+  }
+
+  .price-btn {
+    display: block;
+    text-align: center;
+    padding: 14px;
+    border: 1px solid var(--border);
+    font-size: 13px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    text-decoration: none;
+    color: var(--gold);
+    border-radius: 2px;
+    transition: all 0.2s;
+    font-family: 'DM Sans', sans-serif;
+    cursor: pointer;
+    background: none;
+    width: 100%;
+  }
+
+  .price-btn:hover, .price-btn.filled { background: var(--gold); color: var(--black); }
+
+  .bundle-banner {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-top: 3px solid var(--gold);
+    padding: 32px 40px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 24px;
+    gap: 40px;
+  }
+
+  .bundle-info-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 26px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 6px;
+  }
+
+  .bundle-info-sub {
+    font-size: 14px;
+    color: var(--text-muted);
+  }
+
+  .bundle-price {
+    text-align: right;
+    flex-shrink: 0;
+  }
+
+  .bundle-amount {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 44px;
+    font-weight: 600;
+    color: var(--gold);
+    line-height: 1;
+  }
+
+  .bundle-save {
+    font-size: 12px;
+    color: var(--teal);
+    margin-top: 4px;
+  }
+
+  /* FAQ */
+  .faq-section { background: var(--off-black); }
+
+  .faq-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1px;
+    background: var(--border-dim);
+    border: 1px solid var(--border-dim);
+    margin-top: 56px;
+  }
+
+  .faq-item {
+    background: var(--surface);
+    padding: 32px 28px;
+  }
+
+  .faq-q {
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--text);
+    margin-bottom: 10px;
+    line-height: 1.4;
+  }
+
+  .faq-a {
+    font-size: 13px;
+    color: var(--text-muted);
+    line-height: 1.8;
+  }
+
+  /* CTA */
+  .cta-section {
+    background: var(--black);
+    text-align: center;
+    padding: 120px 48px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .cta-glow {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 500px;
+    height: 500px;
+    background: radial-gradient(circle, rgba(201,168,76,0.07) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .cta-section .section-title {
+    max-width: 600px;
+    margin: 0 auto 16px;
+    font-size: clamp(40px, 5vw, 64px);
+  }
+
+  .cta-sub {
+    font-size: 16px;
+    color: var(--text-muted);
+    max-width: 480px;
+    margin: 0 auto 44px;
+    font-weight: 300;
+  }
+
+  .cta-actions {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    align-items: center;
+  }
+
+  /* FOOTER */
+  footer {
+    background: var(--surface);
+    border-top: 1px solid var(--border-dim);
+    padding: 48px 48px 32px;
+  }
+
+  .footer-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 48px;
+  }
+
+  .footer-brand {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 22px;
+    font-weight: 600;
+    color: var(--gold);
+  }
+
+  .footer-brand span { color: var(--text); font-weight: 400; }
+
+  .footer-tagline {
+    font-size: 12px;
+    color: var(--text-dim);
+    margin-top: 6px;
+    max-width: 280px;
+    line-height: 1.6;
+  }
+
+  .footer-links-group {
+    display: flex;
+    gap: 64px;
+  }
+
+  .footer-col-title {
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+
+  .footer-col-links {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .footer-col-links a {
+    font-size: 13px;
+    color: var(--text-muted);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+
+  .footer-col-links a:hover { color: var(--gold); }
+
+  .footer-bottom {
+    border-top: 1px solid var(--border-dim);
+    padding-top: 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .footer-copy {
+    font-size: 12px;
+    color: var(--text-dim);
+  }
+
+  .footer-legal {
+    display: flex;
+    gap: 24px;
+  }
+
+  .footer-legal a {
+    font-size: 12px;
+    color: var(--text-dim);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+
+  .footer-legal a:hover { color: var(--text-muted); }
+
+  /* ANIMATIONS */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .reveal {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.7s, transform 0.7s;
+  }
+
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+
+  /* RESPONSIVE */
+  @media (max-width: 900px) {
+    nav { padding: 16px 24px; }
+    .nav-links { display: none; }
+    section, .hero { padding-left: 24px; padding-right: 24px; }
+    .levels-intro { grid-template-columns: 1fr; gap: 32px; }
+    .levels-grid { grid-template-columns: 1fr; }
+    .instructor-grid { grid-template-columns: 1fr; gap: 40px; }
+    .testimonials-grid { grid-template-columns: 1fr; }
+    .cert-showcase { grid-template-columns: 1fr; }
+    .pricing-grid { grid-template-columns: 1fr; }
+    .faq-grid { grid-template-columns: 1fr; }
+    .tab-content.active { grid-template-columns: 1fr; }
+    .bundle-banner { flex-direction: column; }
+    .trust-bar { flex-direction: column; align-items: flex-start; }
+    .hero-stats { gap: 32px; flex-wrap: wrap; }
+    .footer-top { flex-direction: column; gap: 32px; }
+    .footer-links-group { flex-wrap: wrap; gap: 32px; }
+    .footer-bottom { flex-direction: column; gap: 12px; text-align: center; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="#" class="nav-logo">Libra Scale <span>World</span></a>
+  <ul class="nav-links">
+    <li><a href="#curriculum">Curriculum</a></li>
+    <li><a href="#instructor">Instructor</a></li>
+    <li><a href="#pricing">Pricing</a></li>
+    <li><a href="#faq">FAQ</a></li>
+    <li><a href="#enrol" class="nav-cta">Enrol Now</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-grid-bg"></div>
+  <div class="hero-glow"></div>
+  <p class="hero-eyebrow">Libra Scale World &nbsp;·&nbsp; Data Science &amp; AI Academy</p>
+  <h1 class="hero-title">Become the leader<br>who <em>understands</em><br>the machine.</h1>
+  <p class="hero-subtitle">Three levels. 28 modules. Real African case studies. A globally recognised certificate from one of the continent's most credible data science voices.</p>
+  <div class="hero-actions">
+    <a href="#enrol" class="btn-primary">Start Your Journey</a>
+    <a href="#curriculum" class="btn-ghost">View Curriculum</a>
+  </div>
+  <div class="hero-stats">
+    <div>
+      <div class="hero-stat-val">28</div>
+      <div class="hero-stat-lbl">Modules</div>
+    </div>
+    <div>
+      <div class="hero-stat-val">130+</div>
+      <div class="hero-stat-lbl">Lessons</div>
+    </div>
+    <div>
+      <div class="hero-stat-val">3</div>
+      <div class="hero-stat-lbl">Certificates</div>
+    </div>
+    <div>
+      <div class="hero-stat-val">150hrs</div>
+      <div class="hero-stat-lbl">Learning</div>
+    </div>
+    <div>
+      <div class="hero-stat-val">Africa+</div>
+      <div class="hero-stat-lbl">Focused</div>
+    </div>
+  </div>
+</section>
+
+<!-- TRUST BAR -->
+<div class="trust-bar">
+  <span class="trust-label">Trusted by professionals from</span>
+  <div class="trust-items">
+    <span class="trust-item">Ikeja Electric</span>
+    <span class="trust-item">Nigerian Banking Sector</span>
+    <span class="trust-item">Telecom Industry</span>
+    <span class="trust-item">Government Agencies</span>
+    <span class="trust-item">UK Diaspora Professionals</span>
+    <span class="trust-item">US-based Executives</span>
+  </div>
+</div>
+
+<!-- LEVELS -->
+<section class="levels-section" id="curriculum">
+  <div class="levels-intro reveal">
+    <div>
+      <p class="section-tag">The Programme</p>
+      <h2 class="section-title">Three levels.<br><em>One transformation.</em></h2>
+    </div>
+    <p class="levels-desc">Designed for professionals who want to lead data and AI work — not just observe it. Each level builds on the last, combining technical rigour with real-world African case studies you will not find anywhere else.</p>
+  </div>
+
+  <div class="levels-grid reveal">
+    <!-- Level 1 -->
+    <div class="level-card">
+      <p class="level-num">Level 01 &nbsp;·&nbsp; Foundation</p>
+      <h3 class="level-name">Data Science Foundations</h3>
+      <p class="level-tagline">For beginners and career changers ready to build their technical base from the ground up.</p>
+      <div class="level-price">$99 <span style="font-size:18px;color:var(--text-dim)">– $149</span></div>
+      <p class="level-price-note">One-time payment &nbsp;·&nbsp; Lifetime access</p>
+      <div class="level-meta">
+        <span class="level-meta-item">9 modules · 45 hours</span>
+        <span class="level-meta-item">Python, SQL, Excel, Statistics</span>
+        <span class="level-meta-item">EDA and Visualisation projects</span>
+        <span class="level-meta-item">Foundations Certificate on completion</span>
+      </div>
+      <div class="level-modules">
+        <p class="level-modules-label">Key modules</p>
+        <span class="module-pill">Python</span>
+        <span class="module-pill">Statistics</span>
+        <span class="module-pill">SQL</span>
+        <span class="module-pill">EDA</span>
+        <span class="module-pill">Visualisation</span>
+        <span class="module-pill">Excel</span>
+        <span class="module-pill">Data Cleaning</span>
+        <span class="module-pill">Capstone</span>
+      </div>
+      <a href="#enrol" class="level-btn">Enrol in Level 1</a>
+    </div>
+
+    <!-- Level 2 -->
+    <div class="level-card featured">
+      <div class="featured-badge">Most Popular</div>
+      <p class="level-num">Level 02 &nbsp;·&nbsp; Intermediate</p>
+      <h3 class="level-name">Data Science &amp; AI for Professionals</h3>
+      <p class="level-tagline">For managers and senior analysts who need to lead, evaluate, and deploy data-driven decisions.</p>
+      <div class="level-price">$199 <span style="font-size:18px;color:var(--text-dim)">– $299</span></div>
+      <p class="level-price-note">One-time payment &nbsp;·&nbsp; Lifetime access</p>
+      <div class="level-meta">
+        <span class="level-meta-item">10 modules · 50 hours</span>
+        <span class="level-meta-item">ML, Power BI, Git, Ethics</span>
+        <span class="level-meta-item">Real deployment project</span>
+        <span class="level-meta-item">Intermediate Certificate on completion</span>
+      </div>
+      <div class="level-modules">
+        <p class="level-modules-label">Key modules</p>
+        <span class="module-pill">Machine Learning</span>
+        <span class="module-pill">Feature Engineering</span>
+        <span class="module-pill">Clustering</span>
+        <span class="module-pill">Power BI</span>
+        <span class="module-pill">Git</span>
+        <span class="module-pill">Ethics</span>
+        <span class="module-pill">Deployment</span>
+        <span class="module-pill">Capstone</span>
+      </div>
+      <a href="#enrol" class="level-btn primary">Enrol in Level 2</a>
+    </div>
+
+    <!-- Level 3 -->
+    <div class="level-card">
+      <p class="level-num">Level 03 &nbsp;·&nbsp; Advanced</p>
+      <h3 class="level-name">Advanced Data Science &amp; AI Practitioner</h3>
+      <p class="level-tagline">For experienced practitioners ready to build production AI systems and lead at the highest level.</p>
+      <div class="level-price">$399 <span style="font-size:18px;color:var(--text-dim)">– $599</span></div>
+      <p class="level-price-note">One-time payment &nbsp;·&nbsp; Lifetime access</p>
+      <div class="level-meta">
+        <span class="level-meta-item">9 modules · 55 hours</span>
+        <span class="level-meta-item">Deep Learning, NLP, MLOps, Kafka</span>
+        <span class="level-meta-item">Live demo capstone with expert panel</span>
+        <span class="level-meta-item">Practitioner Certificate + panel review</span>
+      </div>
+      <div class="level-modules">
+        <p class="level-modules-label">Key modules</p>
+        <span class="module-pill">Deep Learning</span>
+        <span class="module-pill">NLP</span>
+        <span class="module-pill">MLOps</span>
+        <span class="module-pill">Kafka &amp; Spark</span>
+        <span class="module-pill">LLMs</span>
+        <span class="module-pill">AI Agents</span>
+        <span class="module-pill">Governance</span>
+        <span class="module-pill">Live Demo</span>
+      </div>
+      <a href="#enrol" class="level-btn">Enrol in Level 3</a>
+    </div>
+  </div>
+</section>
+
+<!-- MODULES PREVIEW -->
+<section class="modules-section">
+  <p class="section-tag reveal">Inside the Curriculum</p>
+  <h2 class="section-title reveal">Built for the<br><em>real world.</em></h2>
+
+  <div style="margin-top:48px">
+    <div class="modules-tabs">
+      <button class="mod-tab active" onclick="switchTab('l1')">Level 1 — Foundations</button>
+      <button class="mod-tab" onclick="switchTab('l2')">Level 2 — Intermediate</button>
+      <button class="mod-tab" onclick="switchTab('l3')">Level 3 — Advanced</button>
+    </div>
+
+    <div id="tab-l1" class="tab-content active">
+      <div class="mod-item"><div class="mod-item-code">L1·01</div><div class="mod-item-title">Introduction to Data Science</div><div class="mod-item-meta">4 lessons · 3 hrs · No prerequisites</div><div class="mod-item-tags"><span class="mod-tag">Foundation</span><span class="mod-tag">No code</span></div></div>
+      <div class="mod-item"><div class="mod-item-code">L1·02</div><div class="mod-item-title">Python for Data Analysis</div><div class="mod-item-meta">6 lessons · 5.5 hrs · Jupyter lab</div><div class="mod-item-tags"><span class="mod-tag">Foundation</span><span class="mod-tag">Lab</span></div></div>
+      <div class="mod-item"><div class="mod-item-code">L1·03</div><div class="mod-item-title">Basics of Statistics</div><div class="mod-item-meta">5 lessons · 4.5 hrs · Python stats lab</div><div class="mod-item-tags"><span class="mod-tag">Foundation</span><span class="mod-tag">Lab</span></div></div>
+      <div class="mod-item"><div class="mod-item-code">L1·04</div><div class="mod-item-title">Data Cleaning &amp; Preprocessing</div><div class="mod-item-meta">5 lessons · 4.5 hrs · Messy data lab</div><div class="mod-item-tags"><span class="mod-tag">Core skill</span><span class="mod-tag">Lab</span></div></div>
+      <div class="mod-item"><div class="mod-item-code">L1·05</div><div class="mod-item-title">Exploratory Data Analysis</div><div class="mod-item-meta">5 lessons · 4.5 hrs · Full EDA lab</div><div class="mod-item-tags"><span class="mod-tag">Core skill</span><span class="mod-tag">Lab</span></div></div>
+      <div class="mod-item"><div class="mod-item-code">L1·06</div><div class="mod-item-title">Data Visualisation with Matplotlib &amp; Seaborn</div><div class="mod-item-meta">5 lessons · 4.5 hrs · Visualisation lab</div><div class="mod-item-tags"><span class="mod-tag">Core skill</span><span class="mod-tag">Lab</span></div></div>
+      <div class="mod-item"><div class="mod-item-code">L1·07</div><div class="mod-item-title">Excel &amp; Spreadsheets for Analysts</div><div class="mod-item-meta">4 lessons · 3.5 hrs · Excel lab</div><div class="mod-item-tags"><span class="mod-tag">Tool</span></div></div>
+      <div class="mod-item"><div class="mod-item-code">L1·08</div><div class="mod-item-title">SQL Fundamentals</div><div class="mod-item-meta">5 lessons · 4.5 hrs · Live database</div><div class="mod-item-tags"><span class="mod-tag">Core skill</span><span class="mod-tag">Lab</span></div></div>
+      <div class="mod-item"><div class="mod-item-code">L1·09</div><div class="mod-item-title">Capstone: Your First Data Analysis Project</div><div class="mod-item-meta">5 lessons · 5 hrs · Portfolio project</div><div class="mod-item-tags"><span class="mod-tag">Capstone</span><span class="mod-tag">Certificate</span></div></div>
+    </div>
+
+    <div id="tab-l2" class="tab-content">
+      <div class="mod-item"><div class="mod-item-code">L2·01</div><div class="mod-item-title">Introduction to Machine Learning</div><div class="mod-item-meta">4 lessons · 3 hrs · Business mapping</div><div class="mod-item-tags"><span class="mod-tag">Core concept</span><span class="mod-tag">No code</span></div></div>
+      <div class="mod-item"><div class="mod-item-code">L2·02</div><div class="mod-item-title">Supervised vs Unsupervised Learning</div><div class="mod-item-meta">5 lessons · 4.5 hrs · Python lab</div><div class="mod-item-tags"><span class="mod-tag">Core concept</span><span class="mod-tag">Lab</span></div></div>
+      <div class="mod-item"><div class="mod-item-code">L2·03</div><div class="mod-item-title">Feature Engineering</div><div class="mod-item-meta">5 lessons · 4.5 hrs · Pandas lab</div><div class="mod-item-tags"><span class="mod-tag">High impact</span><span class="mod-tag">Lab</span></div></div>
+      <div class="mod-item"><div class="mod-item-code">L2·04</div><div class="mod-item-title">Regression &amp; Classification Algorithms</div><div class="mod-item-meta">5 lessons · 5 hrs · Scikit-learn lab</div><div class="mod-item-tags"><span class="mod-tag">High impact</span><span class="mod-tag">Lab</span></div></div>
+      <div class="mod-item"><div class="mod-item-code">L2·05</div><div class="mod-item-title">Model Evaluation Metrics</div><div class="mod-item-meta">4 lessons · 3.5 hrs · Manager focus</div><div class="mod-item-tags"><span class="mod-tag">Critical skill</span><span class="mod-tag">Manager focus</span></div></div>
+      <div class="mod-item"><div class="mod-item-code">L2·06</div><div class="mod-item-title">Clustering Techniques</div><div class="mod-item-meta">4 lessons · 3.5 hrs · K-means lab</div><div class="mod-item-tags"><span class="mod-tag">Critical skill</span><span class="mod-tag">Lab</span></div></div>
+      <div class="mod-item"><div class="mod-item-code">L2·07</div><div class="mod-item-title">Power BI or Tableau for Professionals</div><div class="mod-item-meta">5 lessons · 5 hrs · Dashboard lab</div><div class="mod-item-tags"><span class="mod-tag">Tool mastery</span><span class="mod-tag">Manager focus</span></div></div>
+      <div class="mod-item"><div class="mod-item-code">L2·08</div><div class="mod-item-title">Git &amp; Version Control for Data Teams</div><div class="mod-item-meta">4 lessons · 3 hrs · GitHub lab</div><div class="mod-item-tags"><span class="mod-tag">Tool</span><span class="mod-tag">Team workflow</span></div></div>
+      <div class="mod-item"><div class="mod-item-code">L2·09</div><div class="mod-item-title">Data Ethics &amp; Privacy</div><div class="mod-item-meta">4 lessons · 3 hrs · Case studies</div><div class="mod-item-tags"><span class="mod-tag">Ethics</span><span class="mod-tag">Manager focus</span></div></div>
+      <div class="mod-item"><div class="mod-item-code">L2·10</div><div class="mod-item-title">Basic ML Deployment &amp; First Project</div><div class="mod-item-meta">7 lessons · 6.5 hrs · Full capstone</div><div class="mod-item-tags"><span class="mod-tag">Capstone</span><span class="mod-tag">Certificate</span></div></div>
+    </div>
+
+    <div id="tab-l3" class="tab-content">
+      <div class="mod-item"><div class="mod-item-code">L3·01</div><div class="mod-item-title">Deep Learning Fundamentals</div><div class="mod-item-meta">6 lessons · 6 hrs · TensorFlow/Keras</div><div class="mod-item-tags"><span class="mod-tag">Advanced</span><span class="mod-tag">Lab</span></div></div>
+      <div class="mod-item"><div class="mod-item-code">L3·02</div><div class="mod-item-title">NLP Basics &amp; Text Intelligence</div><div class="mod-item-meta">6 lessons · 6 hrs · Hugging Face lab</div><div class="mod-item-tags"><span class="mod-tag">Advanced</span><span class="mod-tag">Lab</span></div></div>
+      <div class="mod-item"><div class="mod-item-code">L3·03</div><div class="mod-item-title">MLOps — Operationalising Machine Learning</div><div class="mod-item-meta">6 lessons · 6 hrs · MLflow + Docker</div><div class="mod-item-tags"><span class="mod-tag">Advanced</span><span class="mod-tag">High value</span></div></div>
+      <div class="mod-item"><div class="mod-item-code">L3·04</div><div class="mod-item-title">Real-time Pipelines with Spark &amp; Kafka</div><div class="mod-item-meta">6 lessons · 7 hrs · Pipeline build</div><div class="mod-item-tags"><span class="mod-tag">Advanced</span><span class="mod-tag">High value</span></div></div>
+      <div class="mod-item"><div class="mod-item-code">L3·05</div><div class="mod-item-title">LLMs &amp; Prompt Engineering</div><div class="mod-item-meta">5 lessons · 5 hrs · OpenAI + Claude API</div><div class="mod-item-tags"><span class="mod-tag">Advanced</span><span class="mod-tag">Lab</span></div></div>
+      <div class="mod-item"><div class="mod-item-code">L3·06</div><div class="mod-item-title">AI Agents &amp; Agentic Systems</div><div class="mod-item-meta">5 lessons · 5 hrs · LangChain lab</div><div class="mod-item-tags"><span class="mod-tag">Advanced</span><span class="mod-tag">Lab</span></div></div>
+      <div class="mod-item"><div class="mod-item-code">L3·07</div><div class="mod-item-title">Model Interpretability &amp; Explainability</div><div class="mod-item-meta">5 lessons · 5 hrs · SHAP + LIME lab</div><div class="mod-item-tags"><span class="mod-tag">Advanced</span><span class="mod-tag">Governance</span></div></div>
+      <div class="mod-item"><div class="mod-item-code">L3·08</div><div class="mod-item-title">AI Strategy, Governance &amp; Responsible Deployment</div><div class="mod-item-meta">5 lessons · 5 hrs · Frameworks</div><div class="mod-item-tags"><span class="mod-tag">Advanced</span><span class="mod-tag">Leadership</span></div></div>
+      <div class="mod-item"><div class="mod-item-code">L3·09</div><div class="mod-item-title">End-to-End AI Project — Research to Production</div><div class="mod-item-meta">7 lessons · 8 hrs · Live demo capstone</div><div class="mod-item-tags"><span class="mod-tag">Capstone</span><span class="mod-tag">Live demo</span><span class="mod-tag">Certificate</span></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- INSTRUCTOR -->
+<section class="instructor-section" id="instructor">
+  <div class="instructor-grid reveal">
+    <div class="instructor-card">
+      <div class="instructor-avatar">SO</div>
+      <div class="instructor-name">Dr. Sunny Okonkwo</div>
+      <div class="instructor-role">Head of Data Analytics &nbsp;·&nbsp; Ikeja Electric PLC</div>
+      <div class="instructor-badges">
+        <span class="instructor-badge">MSc Data Science, University of East London</span>
+        <span class="instructor-badge">15+ years across energy, telecoms, and banking</span>
+        <span class="instructor-badge">Member: ACM · IIBA · AAAI</span>
+        <span class="instructor-badge">Speaker: Global Big Data Summit · IIBA Conference</span>
+        <span class="instructor-badge">Award winner: Nigeria · London · New York</span>
+        <span class="instructor-badge">Author: The AI Revolution · The AI Alchemist</span>
+        <span class="instructor-badge">Founder, Libra Scale World &amp; SunnyImpact TV</span>
+      </div>
+    </div>
+
+    <div>
+      <p class="section-tag">Your Instructor</p>
+      <h2 class="instructor-bio-title">Practitioner.<br>Author. <em>Award-winner.</em></h2>
+      <p class="instructor-bio-text">Dr. Sunny Okonkwo does not teach theory from a textbook. He teaches from the inside of a working data analytics department at one of Nigeria's largest power utilities, where real data decisions affect millions of people every day.</p>
+      <p class="instructor-bio-text">His courses are built on the same frameworks he uses at Ikeja Electric — load prediction, customer segmentation, anomaly detection, real-time monitoring. When he teaches feature engineering, the dataset is real. When he teaches AI ethics, the case studies are from African contexts that matter.</p>
+      <p class="instructor-bio-text">He has spoken at international conferences in New York and London, won awards across three continents for data and innovation work, and written multiple books on AI for professional and general audiences. This programme is the distillation of all of it.</p>
+
+      <div class="instructor-achievements">
+        <div class="achievement">
+          <div class="achievement-val">15+</div>
+          <div class="achievement-lbl">Years in data science</div>
+        </div>
+        <div class="achievement">
+          <div class="achievement-val">3</div>
+          <div class="achievement-lbl">Continents, award wins</div>
+        </div>
+        <div class="achievement">
+          <div class="achievement-val">5+</div>
+          <div class="achievement-lbl">AI books authored</div>
+        </div>
+        <div class="achievement">
+          <div class="achievement-val">Real</div>
+          <div class="achievement-lbl">Industry case studies</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section class="testimonials-section">
+  <p class="section-tag reveal">What students say</p>
+  <h2 class="section-title reveal">Built for people<br>doing <em>real work.</em></h2>
+
+  <div class="testimonials-grid reveal">
+    <div class="testimonial">
+      <div class="testimonial-stars">★★★★★</div>
+      <p class="testimonial-quote">The Level 2 programme changed how I manage my analytics team. I finally understand what my data scientists are telling me — and I can now push back intelligently when the numbers do not add up.</p>
+      <div class="testimonial-author">Adaeze M.</div>
+      <div class="testimonial-org">Head of Operations, Lagos-based Fintech</div>
+    </div>
+    <div class="testimonial">
+      <div class="testimonial-stars">★★★★★</div>
+      <p class="testimonial-quote">What sets this apart is that the case studies are ours. Not Silicon Valley startups. Nigerian banks. Nigerian power companies. I could immediately apply what I learned to my own work environment.</p>
+      <div class="testimonial-author">Chukwuemeka O.</div>
+      <div class="testimonial-org">Senior Data Analyst, Commercial Bank</div>
+    </div>
+    <div class="testimonial">
+      <div class="testimonial-stars">★★★★★</div>
+      <p class="testimonial-quote">I completed all three levels over six months. The Level 3 live demo was nerve-wracking but exactly what I needed. I shipped my first production ML model two weeks after graduating. The certificate speaks for itself.</p>
+      <div class="testimonial-author">Kelechi A.</div>
+      <div class="testimonial-org">AI Engineer, UK-based tech consultancy</div>
+    </div>
+  </div>
+</section>
+
+<!-- CERTIFICATE -->
+<section class="cert-section">
+  <p class="section-tag reveal">The Credential</p>
+  <h2 class="section-title reveal">A certificate that<br><em>means something.</em></h2>
+
+  <div class="cert-showcase reveal">
+    <div>
+      <div class="cert-points">
+        <div class="cert-point">
+          <span class="cert-point-num">01</span>
+          <div class="cert-point-text"><strong>Branded by Libra Scale World</strong>Issued under the authority of one of Africa's most recognised data science and AI brands, with international credibility spanning Nigeria, the UK, and the US.</div>
+        </div>
+        <div class="cert-point">
+          <span class="cert-point-num">02</span>
+          <div class="cert-point-text"><strong>Publicly verifiable</strong>Every certificate carries a unique verification URL and QR code. Employers and executives can confirm your credential in seconds.</div>
+        </div>
+        <div class="cert-point">
+          <span class="cert-point-num">03</span>
+          <div class="cert-point-text"><strong>LinkedIn-ready</strong>Add your certificate directly to your LinkedIn profile with a single click. Built for the professional world you actually work in.</div>
+        </div>
+        <div class="cert-point">
+          <span class="cert-point-num">04</span>
+          <div class="cert-point-text"><strong>Earned, not given</strong>Minimum 70% across all module assessments, plus a capstone project. Level 3 requires a live demo before an expert review panel. This credential carries weight because it demands it.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="cert-mockup">
+      <div class="cert-mockup-top">
+        <div class="cert-logo-text">Libra Scale World</div>
+        <div class="cert-divider"></div>
+        <div class="cert-title-text">This is to certify that</div>
+        <div class="cert-name">Your Full Name</div>
+        <div class="cert-award-text">has successfully completed all required assessments<br>and demonstrated professional competency in</div>
+        <div class="cert-credential">Intermediate Data Science &amp; AI</div>
+      </div>
+      <div style="text-align:center;margin:16px 0">
+        <div style="width:60px;height:1px;background:var(--border);margin:0 auto 8px"></div>
+        <div style="font-size:10px;color:var(--text-dim);letter-spacing:0.12em;text-transform:uppercase">Libra Scale World Academy · 2025</div>
+      </div>
+      <div class="cert-bottom">
+        <div>
+          <div class="cert-sig-line"></div>
+          <div class="cert-sig-label">Dr. Sunny Okonkwo</div>
+          <div class="cert-sig-label" style="color:var(--text-dim)">Programme Director</div>
+        </div>
+        <div class="cert-qr">
+          <div class="qr-cell"></div><div class="qr-cell" style="opacity:0"></div><div class="qr-cell"></div><div class="qr-cell"></div><div class="qr-cell"></div>
+          <div class="qr-cell"></div><div class="qr-cell" style="opacity:0"></div><div class="qr-cell" style="opacity:0"></div><div class="qr-cell" style="opacity:0"></div><div class="qr-cell"></div>
+          <div class="qr-cell"></div><div class="qr-cell"></div><div class="qr-cell"></div><div class="qr-cell" style="opacity:0"></div><div class="qr-cell"></div>
+          <div class="qr-cell" style="opacity:0"></div><div class="qr-cell"></div><div class="qr-cell" style="opacity:0"></div><div class="qr-cell"></div><div class="qr-cell" style="opacity:0"></div>
+          <div class="qr-cell"></div><div class="qr-cell"></div><div class="qr-cell"></div><div class="qr-cell"></div><div class="qr-cell"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section class="pricing-section" id="pricing">
+  <p class="section-tag reveal">Investment</p>
+  <h2 class="section-title reveal">Transparent pricing.<br><em>No surprises.</em></h2>
+
+  <div class="pricing-grid reveal">
+    <div class="price-card">
+      <div class="price-level">Level 01</div>
+      <div class="price-name">Foundations</div>
+      <div class="price-amount"><sup>$</sup>129</div>
+      <div class="price-period">One-time · Lifetime access</div>
+      <ul class="price-features">
+        <li class="price-feature">9 modules · 45 hours</li>
+        <li class="price-feature">All labs and datasets included</li>
+        <li class="price-feature">Graded assessments with feedback</li>
+        <li class="price-feature">Foundations Certificate on completion</li>
+        <li class="price-feature">Community forum access</li>
+        <li class="price-feature">Mobile and desktop access</li>
+      </ul>
+      <button class="price-btn" onclick="alert('Enrolment opening soon — register your interest!')">Enrol in Level 1</button>
+    </div>
+
+    <div class="price-card featured">
+      <div class="featured-badge">Most Popular</div>
+      <div class="price-level">Level 02</div>
+      <div class="price-name">Intermediate Professional</div>
+      <div class="price-amount"><sup>$</sup>249</div>
+      <div class="price-period">One-time · Lifetime access</div>
+      <ul class="price-features">
+        <li class="price-feature">10 modules · 50 hours</li>
+        <li class="price-feature">Python, Power BI, Git, ML labs</li>
+        <li class="price-feature">Real Ikeja Electric dataset access</li>
+        <li class="price-feature">Executive memo and ethics assessments</li>
+        <li class="price-feature">Intermediate Certificate on completion</li>
+        <li class="price-feature">Priority community support</li>
+        <li class="price-feature">1 live Q&amp;A session per cohort</li>
+      </ul>
+      <button class="price-btn filled" onclick="alert('Enrolment opening soon — register your interest!')">Enrol in Level 2</button>
+    </div>
+
+    <div class="price-card">
+      <div class="price-level">Level 03</div>
+      <div class="price-name">Advanced Practitioner</div>
+      <div class="price-amount"><sup>$</sup>499</div>
+      <div class="price-period">One-time · Lifetime access</div>
+      <ul class="price-features">
+        <li class="price-feature">9 modules · 55 hours</li>
+        <li class="price-feature">Deep Learning, NLP, MLOps, Kafka</li>
+        <li class="price-feature">LLMs, Agents, SHAP, Governance</li>
+        <li class="price-feature">Live demo before expert review panel</li>
+        <li class="price-feature">Practitioner Certificate + panel feedback</li>
+        <li class="price-feature">GitHub portfolio showcase support</li>
+        <li class="price-feature">Direct instructor office hours</li>
+      </ul>
+      <button class="price-btn" onclick="alert('Enrolment opening soon — register your interest!')">Enrol in Level 3</button>
+    </div>
+  </div>
+
+  <div class="bundle-banner reveal">
+    <div>
+      <div class="bundle-info-title">Full Academy Bundle — All 3 Levels</div>
+      <div class="bundle-info-sub">Complete the entire journey from foundations to advanced practitioner. All 28 modules, 3 certificates, lifetime access to all future updates.</div>
+    </div>
+    <div class="bundle-price">
+      <div class="bundle-amount">$749</div>
+      <div class="bundle-save">Save $128 vs individual pricing</div>
+      <button class="price-btn filled" style="margin-top:16px;width:180px" onclick="alert('Bundle enrolment opening soon!')">Get the Bundle</button>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="faq-section" id="faq">
+  <p class="section-tag reveal">Common Questions</p>
+  <h2 class="section-title reveal">Everything you need<br>to <em>know.</em></h2>
+
+  <div class="faq-grid reveal">
+    <div class="faq-item">
+      <div class="faq-q">Do I need to complete Level 1 before Level 2?</div>
+      <div class="faq-a">Level 2 assumes working knowledge of Python and basic data analysis. If you are already comfortable with Pandas, EDA, and basic statistics, you can start at Level 2 directly. If you are unsure, take the Level 1 free preview modules to assess your readiness.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q">How long does each level take to complete?</div>
+      <div class="faq-a">Level 1 is 45 hours, Level 2 is 50 hours, and Level 3 is 55 hours. Studying part-time at 5 to 8 hours per week, most students complete each level in 6 to 10 weeks. You set your own pace — there are no weekly deadlines.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q">What software and tools will I need?</div>
+      <div class="faq-a">All tools used in the course are free and open source: Python (Anaconda distribution), Jupyter Notebooks, VS Code, and GitHub. Power BI Desktop is free to download. Full setup instructions are provided before each relevant module begins.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q">Are the certificates recognised by employers?</div>
+      <div class="faq-a">Libra Scale World certificates are issued with a public verification URL and LinkedIn integration. They carry the credibility of Dr. Okonkwo's international profile and are grounded in rigorous, assessed learning. Level 3 certificates additionally note expert panel review, which is rare in online education.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q">Is there a corporate or team pricing option?</div>
+      <div class="faq-a">Yes. We offer team licences for organisations wishing to upskill 5 or more staff. Corporate packages include custom cohort scheduling, progress dashboards for HR teams, and optional on-site workshop components. Contact us for a tailored quote.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q">What happens if I do not pass an assessment?</div>
+      <div class="faq-a">All assessments can be retaken. There is no penalty for retaking, and you will receive written feedback after each submission. The pass mark of 70% is firm, but we want you to succeed and the course includes revision resources and instructor support throughout.</div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section" id="enrol">
+  <div class="cta-glow"></div>
+  <p class="section-tag">Begin Your Journey</p>
+  <h2 class="section-title">Ready to lead<br>with <em>data</em>?</h2>
+  <p class="cta-sub">Join the next cohort of professionals earning their Libra Scale World certificate. Enrolment is now open.</p>
+  <div class="cta-actions">
+    <button class="btn-primary" onclick="alert('Registration form coming soon. Thank you for your interest!')">Register Interest</button>
+    <a href="mailto:academy@librascaleworld.com" class="btn-ghost">Contact the team</a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-top">
+    <div>
+      <div class="footer-brand">Libra Scale <span>World</span></div>
+      <div class="footer-tagline">Data Science &amp; AI Academy. Built from the inside of Africa's real data economy.</div>
+    </div>
+    <div class="footer-links-group">
+      <div>
+        <div class="footer-col-title">Programme</div>
+        <ul class="footer-col-links">
+          <li><a href="#curriculum">Level 1 — Foundations</a></li>
+          <li><a href="#curriculum">Level 2 — Intermediate</a></li>
+          <li><a href="#curriculum">Level 3 — Advanced</a></li>
+          <li><a href="#pricing">Bundle Pricing</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="footer-col-title">Company</div>
+        <ul class="footer-col-links">
+          <li><a href="#instructor">About Dr. Okonkwo</a></li>
+          <li><a href="#">Corporate Training</a></li>
+          <li><a href="#">Speaking &amp; Workshops</a></li>
+          <li><a href="#">Books &amp; Resources</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="footer-col-title">Support</div>
+        <ul class="footer-col-links">
+          <li><a href="#faq">FAQ</a></li>
+          <li><a href="#">Contact Us</a></li>
+          <li><a href="#">Student Portal</a></li>
+          <li><a href="#">Certificate Verification</a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <div class="footer-copy">&copy; 2025 Libra Scale World. All rights reserved.</div>
+    <div class="footer-legal">
+      <a href="#">Privacy Policy</a>
+      <a href="#">Terms of Service</a>
+      <a href="#">Refund Policy</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+  function switchTab(level) {
+    document.querySelectorAll('.mod-tab').forEach((t, i) => {
+      t.classList.toggle('active', ['l1','l2','l3'][i] === level);
+    });
+    document.querySelectorAll('.tab-content').forEach(c => {
+      c.classList.toggle('active', c.id === 'tab-' + level);
+    });
+  }
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('visible');
+        observer.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.1 });
+
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+</script>
+</body>
+</html>
